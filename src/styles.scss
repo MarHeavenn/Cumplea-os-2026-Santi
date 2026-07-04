@@ -1,0 +1,45 @@
+:root {
+  --bg-void: #050508;
+  --bg-panel: rgba(12, 14, 28, 0.86);
+  --border-glow: #5b3bd6;
+  --purple: #7c3aed;
+  --purple-soft: #a78bfa;
+  --cyan: #38bdf8;
+  --gold: #f5c451;
+  --text-primary: #eae9f7;
+  --text-dim: #8d8ba8;
+  --danger-red: #e5484d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--purple);
+  color: white;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}

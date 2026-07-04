@@ -1,0 +1,184 @@
+<div class="stage">
+  <div class="particles" aria-hidden="true">
+    <span *ngFor="let p of [1,2,3,4,5,6,7,8,9,10,11,12]"></span>
+  </div>
+
+  <!-- SECUENCIA DE ARRANQUE -->
+  <div class="boot-screen" *ngIf="!booted()">
+    <div class="boot-lines">
+      <p *ngFor="let line of bootLines.slice(0, visibleBootLines())" class="boot-line">
+        {{ line }}
+      </p>
+    </div>
+  </div>
+
+  <!-- MASCOTA FLOTANTE -->
+  <div class="chibi-mascot" *ngIf="booted()" aria-hidden="true">
+    <img [src]="'assets/chibi-' + chibiFrame() + '.png'" alt="" />
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="content" *ngIf="booted()">
+
+    <!-- HERO / NOTIFICACIÓN DEL SISTEMA -->
+    <section class="hero">
+      <div class="system-window enter-1">
+        <div class="system-window__header">
+          <span class="dot"></span> NOTIFICACIÓN DEL SISTEMA
+        </div>
+        <p class="system-window__body">
+          Se ha detectado un evento de rango especial en las coordenadas de tu corazón.
+        </p>
+      </div>
+
+      <h1 class="hero__title enter-2">
+        Feliz Cumpleaños
+      </h1>
+      <p class="hero__name enter-3">{{ nombre }}</p>
+      <p class="hero__subtitle enter-3">{{ tituloEspecial }}</p>
+
+      <div class="level-badge enter-4">
+        <span class="level-badge__label">NIVEL</span>
+        <span class="level-badge__value">{{ ageCount() }}</span>
+      </div>
+
+      <!-- CONTADOR REGRESIVO -->
+      <div class="countdown-box enter-4" *ngIf="!esHoy()">
+        <p class="countdown-box__label">Cuenta regresiva para tu próximo nivel</p>
+        <div class="countdown-box__grid">
+          <div class="countdown-unit">
+            <span class="countdown-unit__value">{{ countdown().dias }}</span>
+            <span class="countdown-unit__label">días</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-unit__value">{{ countdown().horas }}</span>
+            <span class="countdown-unit__label">horas</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-unit__value">{{ countdown().minutos }}</span>
+            <span class="countdown-unit__label">min</span>
+          </div>
+          <div class="countdown-unit">
+            <span class="countdown-unit__value">{{ countdown().segundos }}</span>
+            <span class="countdown-unit__label">seg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CELEBRACIÓN AL LLEGAR LA FECHA -->
+      <div class="celebration" *ngIf="esHoy()">
+        <div class="celebration__burst" aria-hidden="true">
+          <span
+            *ngFor="let i of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]"
+            [style.--angle.deg]="i * 22.5"
+            [style.animation-delay.ms]="i * 60">
+          </span>
+        </div>
+        <p class="celebration__text">¡HOY ES TU DÍA, {{ nombre }}!</p>
+        <p class="celebration__subtext">Nivel {{ edadNueva }} desbloqueado ✨</p>
+      </div>
+    </section>
+
+    <!-- VENTANA DE ESTADO -->
+    <section class="panel status-window">
+      <h2 class="panel__title">Ventana de Estado</h2>
+      <dl class="status-grid">
+        <div class="status-row">
+          <dt>Nombre</dt>
+          <dd>{{ nombre }}</dd>
+        </div>
+        <div class="status-row">
+          <dt>Título</dt>
+          <dd>{{ tituloEspecial }}</dd>
+        </div>
+        <div class="status-row">
+          <dt>Clase</dt>
+          <dd>Novio S-Rank</dd>
+        </div>
+        <div class="status-row">
+          <dt>Rango</dt>
+          <dd class="rank">S</dd>
+        </div>
+      </dl>
+
+      <div class="stat-bars">
+        <div class="stat-bar" *ngFor="let s of stats">
+          <div class="stat-bar__labels">
+            <span>{{ s.label }}</span>
+            <span class="stat-bar__value">{{ s.value }}</span>
+          </div>
+          <div class="stat-bar__track">
+            <div class="stat-bar__fill" [style.width.%]="s.value"></div>
+          </div>
+          <p class="stat-bar__hint">{{ s.hint }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DESPERTAR -->
+    <section class="panel awakening-section" #awakeningRef [class.is-awakened]="awakened()">
+      <h2 class="panel__title">Secuencia de Despertar</h2>
+
+      <div class="awakening-frame" (click)="toggleLevelUp()">
+        <img
+          class="awakening-frame__img"
+          [src]="showLevelUp() ? 'assets/levelup.png' : 'assets/despertar.png'"
+          alt="Retrato de {{ nombre }} estilo despertar de monarca de las sombras" />
+        <div class="awakening-frame__glow"></div>
+        <div class="awakening-frame__particles" aria-hidden="true">
+          <span *ngFor="let p of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]"></span>
+        </div>
+        <div class="awakening-frame__flash"></div>
+      </div>
+
+      <div class="awakening-console" *ngIf="awakened()">
+        <p
+          *ngFor="let line of awakeningLines.slice(0, awakeningLineIndex()); let last = last"
+          class="awakening-console__line"
+          [class.awakening-console__line--final]="last && awakeningLineIndex() === awakeningLines.length">
+          {{ line }}
+        </p>
+      </div>
+
+      <p class="awakening-hint">
+        {{ showLevelUp() ? 'Toca de nuevo para volver' : 'Toca la imagen para desatar el nivel máximo' }}
+      </p>
+    </section>
+
+    <!-- REGISTRO DE MISIONES -->
+    <section class="panel quest-log">
+      <h2 class="panel__title">Registro de Misiones</h2>
+      <ul class="quest-list">
+        <li class="quest" *ngFor="let q of quests">
+          <span class="quest__check" [class.done]="q.status !== 'en curso'">
+            {{ q.status === 'en curso' ? '…' : '✓' }}
+          </span>
+          <span class="quest__title">{{ q.title }}</span>
+          <span class="quest__status" [ngClass]="q.status.replace(' ', '-')">
+            {{ q.status }}
+          </span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ARISE / CARTA FINAL -->
+    <section class="panel arise-section">
+      <button
+        type="button"
+        class="arise-btn"
+        (click)="toggleLetter()"
+        [attr.aria-expanded]="letterOpen()"
+        aria-controls="carta-final">
+        {{ letterOpen() ? 'Cerrar' : '¡ARISE!' }}
+      </button>
+
+      <div id="carta-final" class="letter" *ngIf="letterOpen()">
+        <p class="letter__text">{{ cartaFinal }}</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Hecho con &lt;3 para el mejor jugador de mi party.</p>
+    </footer>
+  </main>
+</div>
